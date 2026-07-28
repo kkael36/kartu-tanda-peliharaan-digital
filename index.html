@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id" class="antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Digital ID</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts untuk font error state yang clean -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 md:p-8">
+
+    <!-- 1. State: Loading -->
+    <div id="loading-state" class="flex flex-col items-center">
+        <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-slate-800 border-opacity-50 mb-3"></div>
+        <p class="text-slate-500 font-medium text-sm">Memuat KTP Digital...</p>
+    </div>
+
+    <!-- 2. State: Error (Muncu kalau ID kosong atau gambar gak ketemu) -->
+    <div id="error-state" class="hidden text-center max-w-sm w-full bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+        <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <h2 class="text-lg font-bold text-slate-800 mb-2">Akses Ditolak</h2>
+        <p class="text-slate-500 text-sm leading-relaxed">KTP Digital tidak valid atau kartu tidak terdaftar.</p>
+    </div>
+
+    <!-- 3. State: Success (Nampilin Gambar KTP) -->
+    <!-- Max-width diatur ke 450px biar ukurannya pas dan proporsional di layar HP maupun Desktop -->
+    <div id="success-state" class="hidden w-full max-w-[450px] transition-opacity duration-500">
+        <!-- Gambar dengan efek shadow 2xl dan border tipis biar elegan -->
+        <img 
+            id="ktp-image" 
+            src="" 
+            alt="Pet Digital ID Card" 
+            class="w-full h-auto rounded-xl shadow-2xl border border-black/5 object-contain"
+        >
+    </div>
+
+    <!-- Script Logika -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Ambil parameter '?id=' dari URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const petId = urlParams.get('id');
+
+            // Ambil elemen dari HTML
+            const loadingState = document.getElementById('loading-state');
+            const errorState = document.getElementById('error-state');
+            const successState = document.getElementById('success-state');
+            const ktpImage = document.getElementById('ktp-image');
+
+            // Cek 1: Kalau nggak ada parameter ID di URL sama sekali
+            if (!petId) {
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+                return; // Stop script
+            }
+
+            // Set jalur gambar berdasarkan ID (Pastikan ada folder /images/ di root lu)
+            const imagePath = `./images/${petId}.jpg`;
+            ktpImage.src = imagePath;
+
+            // Cek 2: Kalau gambar BERHASIL dimuat
+            ktpImage.onload = () => {
+                loadingState.classList.add('hidden');
+                successState.classList.remove('hidden');
+            };
+
+            // Cek 3: Kalau gambar GAGAL dimuat (Misal file 0001.jpg nggak ada di folder)
+            ktpImage.onerror = () => {
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+            };
+        });
+    </script>
+</body>
+</html>
