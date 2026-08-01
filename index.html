@@ -20,7 +20,7 @@
         <p class="text-slate-500 font-medium text-sm">Memuat KTP Digital...</p>
     </div>
 
-    <!-- 2. State: Error (Muncu kalau ID kosong atau gambar gak ketemu) -->
+    <!-- 2. State: Error (Muncul kalau ID kosong atau gambar gak ketemu) -->
     <div id="error-state" class="hidden text-center max-w-sm w-full bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
         <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
@@ -29,16 +29,24 @@
         <p class="text-slate-500 text-sm leading-relaxed">KTP Digital tidak valid atau kartu tidak terdaftar.</p>
     </div>
 
-    <!-- 3. State: Success (Nampilin Gambar KTP) -->
-    <!-- Max-width diatur ke 450px biar ukurannya pas dan proporsional di layar HP maupun Desktop -->
-    <div id="success-state" class="hidden w-full max-w-[450px] transition-opacity duration-500">
-        <!-- Gambar dengan efek shadow 2xl dan border tipis biar elegan -->
+    <!-- 3. State: Success (Nampilin Gambar KTP + Tombol Download) -->
+    <div id="success-state" class="hidden w-full max-w-[450px] transition-opacity duration-500 flex flex-col gap-4">
+        <!-- Gambar dengan efek shadow 2xl dan border tipis -->
         <img 
             id="ktp-image" 
             src="" 
             alt="Pet Digital ID Card" 
             class="w-full h-auto rounded-xl shadow-2xl border border-black/5 object-contain"
         >
+        
+        <!-- Tombol Download -->
+        <a id="download-btn" href="#" download class="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-300 shadow-md">
+            <!-- Icon Download dari Heroicons -->
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Unduh KTP Digital
+        </a>
     </div>
 
     <!-- Script Logika -->
@@ -53,6 +61,7 @@
             const errorState = document.getElementById('error-state');
             const successState = document.getElementById('success-state');
             const ktpImage = document.getElementById('ktp-image');
+            const downloadBtn = document.getElementById('download-btn'); // Tambahan elemen tombol
 
             // Cek 1: Kalau nggak ada parameter ID di URL sama sekali
             if (!petId) {
@@ -61,7 +70,7 @@
                 return; // Stop script
             }
 
-            // Set jalur gambar berdasarkan ID (Pastikan ada folder /images/ di root lu)
+            // Set jalur gambar berdasarkan ID 
             const imagePath = `./images/${petId}.webp`;
             ktpImage.src = imagePath;
 
@@ -69,9 +78,13 @@
             ktpImage.onload = () => {
                 loadingState.classList.add('hidden');
                 successState.classList.remove('hidden');
+                
+                // Set href dan nama file buat di-download
+                downloadBtn.href = imagePath;
+                downloadBtn.download = `KTP_Digital_${petId}.webp`;
             };
 
-            // Cek 3: Kalau gambar GAGAL dimuat (Misal file 0001.jpg nggak ada di folder)
+            // Cek 3: Kalau gambar GAGAL dimuat (Misal file nggak ada di folder)
             ktpImage.onerror = () => {
                 loadingState.classList.add('hidden');
                 errorState.classList.remove('hidden');
